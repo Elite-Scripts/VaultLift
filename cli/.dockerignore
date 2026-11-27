@@ -1,0 +1,5 @@
+# Build context ships only what the Dockerfile consumes
+*
+!Dockerfile
+!loop.sh
+!register.sh

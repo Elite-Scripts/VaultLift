@@ -1,0 +1,11 @@
+# JetBrains Personal IDE files
+.idea
+
+# Host-visible exchange directory - the only state VaultLift ever creates.
+# The directory itself is tracked via .gitkeep; everything inside is ignored.
+work/*
+!work/.gitkeep
+
+# Docker build artifacts (docker save / image export scratch)
+*.tar
+*.tar.gz

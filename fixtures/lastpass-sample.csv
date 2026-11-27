@@ -1,0 +1,7 @@
+url,username,password,extra,name,grouping,fav
+https://example.com,alice@example.com,d0fbb4bd-779d-4b16-8b48-2d5e0b0af4k3,"Plain note: nothing special here",Example Login,Personal,0
+https://github.com,octocat,correct-horse-battery-staple,"Note with ""escaped"" quotes, plus a comma",GitHub,Personal,1
+https://intranet.corp.example,admin,ChangeMe-2026-11,"Multi-line note: first line
+second line after an embedded newline",Intranet Admin,Work,0
+ssh://build.example.com,deploy,,"Build host; this row has an empty password",Build Server,Work/Sub-team,0
+https://notes.example.com,,,A plain row with no note,Standalone Note,Notes,0

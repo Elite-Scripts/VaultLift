@@ -1,0 +1,55 @@
+# VaultLift - disposable, zero-retention migration stack.
+#
+# Everything here is container-local and dies with `docker compose down -v`:
+#   - the network is internal: no outbound route from either container
+#   - no published ports at all
+#   - vaultwarden keeps its SQLite database on a tmpfs (/data)
+#   - bwcli keeps bw's config/session state on a tmpfs (/root/.config)
+#   - the vendor export and the JSON output cross the boundary via the ./work
+#     bind mount - the only host-visible state
+#   - there are no named volumes anywhere in this file
+
+name: vaultlift
+
+services:
+  vaultwarden:
+    image: vaultwarden/server:1.37.5
+    tmpfs:
+      - /data
+    environment:
+      SIGNUPS_ALLOWED: "true"
+      SIGNUPS_VERIFY: "false"
+      DISABLE_ICON_DOWNLOAD: "true"
+      ICON_SERVICE: "internal"
+      ICON_CACHE_TTL: "0"
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "--silent", "http://localhost/alive"]
+      interval: 3s
+      timeout: 3s
+      retries: 30
+
+  bwcli:
+    build:
+      context: ./cli
+    pull_policy: build
+    depends_on:
+      vaultwarden:
+        condition: service_healthy
+    environment:
+      # debug aid: print the ephemeral account email + passphrase once after
+      # auto-registration. False = credentials stay inside the container.
+      # Override with -e VAULTLIFT_SHOW_PASSPHRASE=true on the compose run.
+      VAULTLIFT_SHOW_PASSPHRASE: "false"
+    volumes:
+      - ./work:/work
+    tmpfs:
+      # bw writes its config and session-key bookkeeping to
+      # /root/.config/Bitwarden CLI - tmpfs so it dies with the container
+      - /root/.config
+    command: ["/loop.sh"]
+
+# internal: no default gateway/NAT - no outbound route from either
+# container; only container-to-container traffic on this network exists.
+networks:
+  default:
+    internal: true
